@@ -56,8 +56,11 @@ install:
 	forge install openzeppelin/openzeppelin-contracts@v4.8.3 --no-commit && \
 	forge install transmissions11/solmate@v6 --no-commit
 
-exploit-level-2: anvil-network
+exploit-level-2:
 	@echo "Enter level instance contract address:"
 	@read CONTRACT_ADDRESS; \
 	export CONTRACT_ADDRESS=$$CONTRACT_ADDRESS; \
 	forge script script/Level2.s.sol:Exploit $(NETWORK_ARGS) -vvvv
+
+anvil-exploit-level-2: anvil-network exploit-level-2
+holesky-exploit-level-2: holesky-network exploit-level-2
