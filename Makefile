@@ -18,7 +18,7 @@ snapshot 	:; forge snapshot
 format 		:; forge fmt
 
 # Configure Anvil
-anvil 				:; anvil -m 'test test test test test test test test test test test junk' --steps-tracing #--block-time 1
+anvil 				:; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 DEFAULT_ANVIL_KEY 	:= 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 # Configure Network Variables
@@ -32,11 +32,9 @@ anvil-network:
 holesky-network: 
 	$(eval \
 		NETWORK_ARGS := --broadcast \
-			--rpc-url $(HOLESKY_RPC_URL) \
-			--private-key $(HOLESKY_PRIVATE_KEY) \
-			--verify \
-			--etherscan-api-key $(ETHERSCAN_API_KEY) \
-	)
+						--rpc-url $(HOLESKY_RPC_URL) \
+						--private-key $(HOLESKY_PRIVATE_KEY) \
+				)
 
 # mainnet-network: 
 # 	$(eval \
@@ -56,11 +54,32 @@ install:
 	forge install openzeppelin/openzeppelin-contracts@v4.8.3 --no-commit && \
 	forge install transmissions11/solmate@v6 --no-commit
 
-exploit-level-2:
+input-and-store-contract-address:
 	@echo "Enter level instance contract address:"
-	@read CONTRACT_ADDRESS; \
-	export CONTRACT_ADDRESS=$$CONTRACT_ADDRESS; \
+	@read CONTRACT_ADDRESS_INPUT; \
+	export CONTRACT_ADDRESS=$$CONTRACT_ADDRESS_INPUT; \
+	rm -f temp_contract_address.txt; \
+	echo $$CONTRACT_ADDRESS > temp_contract_address.txt 
+
+exploit-level-2:
+	export CONTRACT_ADDRESS=$(CONTRACT_ADDRESS_MAKE_VAR); \
 	forge script script/Level2.s.sol:Exploit $(NETWORK_ARGS) -vvvv
 
-anvil-exploit-level-2: anvil-network exploit-level-2
-holesky-exploit-level-2: holesky-network exploit-level-2
+anvil-exploit-level-2: anvil-network input-and-store-contract-address exploit-level-2
+holesky-exploit-level-2: holesky-network input-and-store-contract-address exploit-level-2
+
+# Wiaitng 12 seconds between each execution to avoid simulation failing even thouhgh it would run fine on 
+# the actual network. This is a limitation of using foundry for this specific task requiring block numbers.
+exploit-level-3:
+	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
+	while forge script script/Level3.s.sol:Exploit $(NETWORK_ARGS) -vvvvv; do \
+		echo "Script executed successfully."; \
+		echo "Waiting 12 seconds..."; \
+		sleep 12; \
+		echo "Retrying..."; \
+		export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
+	done; \
+	echo "Script execution stopped."
+
+anvil-exploit-level-3: anvil-network input-and-store-contract-address exploit-level-3
+holesky-exploit-level-3: holesky-network input-and-store-contract-address exploit-level-3
