@@ -17,14 +17,7 @@ contract Exploit is Script, GetInstanceAddress {
         if (targetContract.consecutiveWins() < 10) {
             vm.startBroadcast();
 
-            console.log("hash: %s", uint256(blockhash(block.number - 1)));
-
-            // CoinFlipGuess coinFlipGuess = new CoinFlipGuess();
-            // coinFlipGuess.flip(targetContractAddress);
-
-            CoinFlipGuess coinFlipGuess = CoinFlipGuess(
-                0x5Ed77b82bD07409ed87e4dF452213961411c81a1
-            );
+            CoinFlipGuess coinFlipGuess = new CoinFlipGuess();
             coinFlipGuess.flip(targetContractAddress);
 
             vm.stopBroadcast();
