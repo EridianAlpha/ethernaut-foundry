@@ -52,16 +52,26 @@ input-and-store-contract-address:
 	rm -f temp_contract_address.txt; \
 	echo $$CONTRACT_ADDRESS > temp_contract_address.txt 
 
+
 # ================================================================
-# │                            LEVEL 2                           │
+# │                          LEVEL TEMPLATE                      │
 # ================================================================
-exploit-level-2:
-	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
-	forge script script/Level2.s.sol:Exploit $(NETWORK_ARGS) -vvvv
+define exploit_template
+exploit-level-$(1):
+	export CONTRACT_ADDRESS=$$(shell cat temp_contract_address.txt); \
+	forge script script/Level$(1).s.sol:Exploit $$(NETWORK_ARGS) -vvvv
 	rm -f temp_contract_address.txt
 
-anvil-exploit-level-2: anvil-network input-and-store-contract-address exploit-level-2
-holesky-exploit-level-2: holesky-network input-and-store-contract-address exploit-level-2
+anvil-exploit-level-$(1): anvil-network input-and-store-contract-address exploit-level-$(1)
+holesky-exploit-level-$(1): holesky-network input-and-store-contract-address exploit-level-$(1)
+endef
+
+# List of levels
+LEVELS := 2 4 5 6 7
+
+# Generate rules for each level
+$(foreach level,$(LEVELS),$(eval $(call exploit_template,$(level))))
+
 
 # ================================================================
 # │                            LEVEL 3                           │
@@ -82,36 +92,3 @@ exploit-level-3:
 
 anvil-exploit-level-3: anvil-network input-and-store-contract-address exploit-level-3
 holesky-exploit-level-3: holesky-network input-and-store-contract-address exploit-level-3
-
-# ================================================================
-# │                            LEVEL 4                           │
-# ================================================================
-exploit-level-4:
-	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
-	forge script script/Level4.s.sol:Exploit $(NETWORK_ARGS) -vvvv
-	rm -f temp_contract_address.txt
-
-anvil-exploit-level-4: anvil-network input-and-store-contract-address exploit-level-4
-holesky-exploit-level-4: holesky-network input-and-store-contract-address exploit-level-4
-
-# ================================================================
-# │                            LEVEL 5                           │
-# ================================================================
-exploit-level-5:
-	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
-	forge script script/Level5.s.sol:Exploit $(NETWORK_ARGS) -vvvv
-	rm -f temp_contract_address.txt
-
-anvil-exploit-level-5: anvil-network input-and-store-contract-address exploit-level-5
-holesky-exploit-level-5: holesky-network input-and-store-contract-address exploit-level-5
-
-# ================================================================
-# │                            LEVEL 6                           │
-# ================================================================
-exploit-level-6:
-	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
-	forge script script/Level6.s.sol:Exploit $(NETWORK_ARGS) -vvvv
-	rm -f temp_contract_address.txt
-
-anvil-exploit-level-6: anvil-network input-and-store-contract-address exploit-level-6
-holesky-exploit-level-6: holesky-network input-and-store-contract-address exploit-level-6

