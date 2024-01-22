@@ -93,3 +93,14 @@ exploit-level-4:
 
 anvil-exploit-level-4: anvil-network input-and-store-contract-address exploit-level-4
 holesky-exploit-level-4: holesky-network input-and-store-contract-address exploit-level-4
+
+# ================================================================
+# │                            LEVEL 5                           │
+# ================================================================
+exploit-level-5:
+	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
+	forge script script/Level5.s.sol:Exploit $(NETWORK_ARGS) -vvvv
+	rm -f temp_contract_address.txt
+
+anvil-exploit-level-5: anvil-network input-and-store-contract-address exploit-level-5
+holesky-exploit-level-5: holesky-network input-and-store-contract-address exploit-level-5
