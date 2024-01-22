@@ -36,15 +36,6 @@ holesky-network:
 						--private-key $(HOLESKY_PRIVATE_KEY) \
 				)
 
-# mainnet-network: 
-# 	$(eval \
-# 		NETWORK_ARGS := --broadcast \
-# 			--rpc-url $(MAINNET_RPC_URL) \
-# 			--private-key $(MAINNET_PRIVATE_KEY) \
-# 			--verify \
-# 			--etherscan-api-key $(ETHERSCAN_API_KEY) \
-# 	)
-
 # ================================================================
 # │                CONTRACT SPECIFIC CONFIGURATION               │
 # ================================================================
@@ -61,15 +52,22 @@ input-and-store-contract-address:
 	rm -f temp_contract_address.txt; \
 	echo $$CONTRACT_ADDRESS > temp_contract_address.txt 
 
+# ================================================================
+# │                            LEVEL 2                           │
+# ================================================================
 exploit-level-2:
-	export CONTRACT_ADDRESS=$(CONTRACT_ADDRESS_MAKE_VAR); \
+	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
 	forge script script/Level2.s.sol:Exploit $(NETWORK_ARGS) -vvvv
+	rm -f temp_contract_address.txt
 
 anvil-exploit-level-2: anvil-network input-and-store-contract-address exploit-level-2
 holesky-exploit-level-2: holesky-network input-and-store-contract-address exploit-level-2
 
+# ================================================================
+# │                            LEVEL 3                           │
+# ================================================================
 # Wiaitng 12 seconds between each execution to avoid simulation failing even thouhgh it would run fine on 
-# the actual network. This is a limitation of using foundry for this specific task requiring block numbers.
+# the actual network. This is a limitation of using foundry for this specific task requiring block hashes.
 exploit-level-3:
 	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
 	while forge script script/Level3.s.sol:Exploit $(NETWORK_ARGS) -vvvvv; do \
@@ -80,6 +78,18 @@ exploit-level-3:
 		export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
 	done; \
 	echo "Script execution stopped."
+	rm -f temp_contract_address.txt
 
 anvil-exploit-level-3: anvil-network input-and-store-contract-address exploit-level-3
 holesky-exploit-level-3: holesky-network input-and-store-contract-address exploit-level-3
+
+# ================================================================
+# │                            LEVEL 4                           │
+# ================================================================
+exploit-level-4:
+	export CONTRACT_ADDRESS=$(shell cat temp_contract_address.txt); \
+	forge script script/Level4.s.sol:Exploit $(NETWORK_ARGS) -vvvv
+	rm -f temp_contract_address.txt
+
+anvil-exploit-level-4: anvil-network input-and-store-contract-address exploit-level-4
+holesky-exploit-level-4: holesky-network input-and-store-contract-address exploit-level-4

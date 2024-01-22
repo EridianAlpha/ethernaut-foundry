@@ -3,8 +3,7 @@ pragma solidity ^0.8.18;
 
 import {Script, console} from "forge-std/Script.sol";
 
-contract ParseHexString is Script {
-    // Helper function to parse a hex string as an Ethereum address
+contract HelperFunctions is Script {
     function parseHexString(
         string memory _a
     ) internal pure returns (address _parsedAddress) {
@@ -28,9 +27,7 @@ contract ParseHexString is Script {
         }
         return address(iaddr);
     }
-}
 
-contract GetInstanceAddress is Script, ParseHexString {
     function getInstanceAddress() internal view returns (address) {
         string memory contractAddressStr = vm.envString("CONTRACT_ADDRESS");
         require(
@@ -45,5 +42,30 @@ contract GetInstanceAddress is Script, ParseHexString {
         );
 
         return targetContractAddress;
+    }
+
+    function writeToFile(string memory filePath, string memory data) public {
+        string[] memory args = new string[](3);
+        args[0] = "bash";
+        args[1] = "-c";
+        args[2] = string.concat("echo '", data, "' > ", filePath);
+
+        vm.ffi(args);
+    }
+
+    function addressToString(
+        address _addr
+    ) public pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(_addr)));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(42);
+        str[0] = "0";
+        str[1] = "x";
+        for (uint256 i = 0; i < 20; i++) {
+            str[2 + i * 2] = alphabet[uint8(value[i + 12] >> 4)];
+            str[3 + i * 2] = alphabet[uint8(value[i + 12] & 0x0f)];
+        }
+        return string(str);
     }
 }
