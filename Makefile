@@ -67,7 +67,7 @@ holesky-exploit-level-$(1): holesky-network input-and-store-contract-address exp
 endef
 
 # List of levels
-LEVELS := 2 4 5 6 7
+LEVELS := 2 4 5 6 7 8
 
 # Generate rules for each level
 $(foreach level,$(LEVELS),$(eval $(call exploit_template,$(level))))
