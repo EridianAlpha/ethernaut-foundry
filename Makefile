@@ -60,14 +60,14 @@ define exploit_template
 exploit-level-$(1):
 	export CONTRACT_ADDRESS=$$(shell cat temp_contract_address.txt); \
 	forge script script/Level$(1).s.sol:Exploit $$(NETWORK_ARGS) -vvvv
-	rm -f temp_contract_address.txt
+	@rm -f temp_contract_address.txt
 
 anvil-exploit-level-$(1): anvil-network input-and-store-contract-address exploit-level-$(1)
 holesky-exploit-level-$(1): holesky-network input-and-store-contract-address exploit-level-$(1)
 endef
 
 # List of levels
-LEVELS := 2 4 5 6 7 8 9
+LEVELS := 2 4 5 6 7 8 9 10
 
 # Generate rules for each level
 $(foreach level,$(LEVELS),$(eval $(call exploit_template,$(level))))
