@@ -43,7 +43,6 @@ input-and-store-contract-address:
 	rm -f temp_contract_address.txt; \
 	echo $$CONTRACT_ADDRESS > temp_contract_address.txt 
 
-
 # ================================================================
 # │                          LEVEL TEMPLATE                      │
 # ================================================================
@@ -62,7 +61,6 @@ LEVELS := 2 4 5 6 7 8 9 10 11
 
 # Generate rules for each level
 $(foreach level,$(LEVELS),$(eval $(call exploit_template,$(level))))
-
 
 # ================================================================
 # │                            LEVEL 3                           │
