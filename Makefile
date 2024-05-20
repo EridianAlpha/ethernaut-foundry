@@ -3,30 +3,21 @@
 # ================================================================
 -include .env
 
-.PHONY: all test clean help install snapshot format anvil
-
-help:
-	@echo "Usage:"
-	@echo "  make deploy-anvil\n
+.PHONY: clean install anvil
 
 clean 		:; forge clean
-remove 		:; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 update 		:; forge update
 build 		:; forge build
-test 		:; forge test
-snapshot 	:; forge snapshot
-format 		:; forge fmt
 
 # Configure Anvil
-anvil 				:; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
-DEFAULT_ANVIL_KEY 	:= 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+anvil 				:; anvil -m 'test test test test test test test test test test test junk' --steps-tracing
 
 # Configure Network Variables
 anvil-network:
 	$(eval \
 		NETWORK_ARGS := --broadcast \
-						--rpc-url http://localhost:8545 \
-						--private-key $(DEFAULT_ANVIL_KEY) \
+						--rpc-url $(ANVIL_RPC_URL) \
+						--private-key $(ANVIL_PRIVATE_KEY) \
 	)
 
 holesky-network: 
@@ -59,7 +50,7 @@ input-and-store-contract-address:
 define exploit_template
 exploit-level-$(1):
 	export CONTRACT_ADDRESS=$$(shell cat temp_contract_address.txt); \
-	forge script script/Level$(1).s.sol:Exploit $$(NETWORK_ARGS) -vvvv
+	forge script script/Level$(1).s.sol:Exploit $$(NETWORK_ARGS) -vvvv --evm-version $(EVM_VERSION)
 	@rm -f temp_contract_address.txt
 
 anvil-exploit-level-$(1): anvil-network input-and-store-contract-address exploit-level-$(1)
@@ -67,7 +58,7 @@ holesky-exploit-level-$(1): holesky-network input-and-store-contract-address exp
 endef
 
 # List of levels
-LEVELS := 2 4 5 6 7 8 9 10
+LEVELS := 2 4 5 6 7 8 9 10 11
 
 # Generate rules for each level
 $(foreach level,$(LEVELS),$(eval $(call exploit_template,$(level))))
