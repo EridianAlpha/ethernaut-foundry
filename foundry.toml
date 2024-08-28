@@ -9,7 +9,7 @@ optimizer_runs = 200    # Set the number of optimizer runs
 via_ir = true           # Enable IR generation (Used for custom errors in require statements)
 
 # Set any warnings to ignore for specific files (e.g. selfDestruct when used in tests to force send ETH)
-ignored_warnings_from = ["src/Level7.sol"] # Ignore warnings from selfDestruct in Level7.sol
+ignored_warnings_from = ["src/Level7.sol", "src/Level25.sol"] # Ignore warnings from selfDestruct in Level7.sol
 
 # Set the remappings for the Solidity compiler
 remappings = [
